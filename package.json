@@ -1,0 +1,18 @@
+{
+  "name": "cardgame",
+  "version": "1.0.0",
+  "description": "Card game ",
+  "main": "index.html",
+  "scripts": {
+    "start": "lite-server -c=bs-config.json"
+  },
+  "keywords": [
+   "card game",
+   "shredding game"
+  ],
+  "author": "pradeep prabhu b r",
+  "license": "MIT",
+  "devDependencies": {
+    "lite-server": "^2.3.0"
+  }
+}

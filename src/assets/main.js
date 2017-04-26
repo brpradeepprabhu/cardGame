@@ -344,7 +344,7 @@ function oppositionPlayCard(value, playerPosition) {
     cardName.y = stage.canvas.height / 2;
     cardName.rotation = Math.random() * 360;
     oppsitePlayer.removeChildAt(random);
-    console.log(cardName)
+    console.log(cardName); oppositeCard = target.data;
     oppositePlayed = 1;
     userPlayCard(cardName.data);
   } else {
@@ -377,9 +377,10 @@ function oppositionPlayCard(value, playerPosition) {
       cardName.x = stage.canvas.width / 2;
       cardName.y = stage.canvas.height / 2;
       cardName.rotation = Math.random() * 360;
+      oppositeCard = target.data;
       oppsitePlayer.removeChildAt(random);
     }
-    validateNextCardShredding();
+       setTimeout(function(){    validateNextCardShredding();},2000)
   }
   otherPlayerCard();
 
@@ -423,7 +424,7 @@ function userPlayCard(value) {
 function cardClicked(e) {
   var cardName = e.currentTarget;
   var random = e.currentTarget.name;
-  console.log(random);
+  console.log(random,"came",oppositePlayed);
   players[0].splice(random, 1)
   cardName.rotation = Math.random() * 180;
   playerContainer.removeChildAt(random);
@@ -434,24 +435,32 @@ function cardClicked(e) {
   cardName.y = stage.canvas.height / 2;
   cardShreddingContainer.addChild(cardName);
   playerCard = cardName.data;
-  createPlayerCard();
+ 
   if (oppositePlayed == 0) {
     oppositionPlayCard(e.currentTarget.data, 1);
     oppositePlayed = 1;
   } else {
-    validateNextCardShredding();
-  }
+    setTimeout(function(){    validateNextCardShredding();},2000)
 
+  }
+  createPlayerCard();
 }
 
 function validateNextCardShredding() {
+    oppositePlayed = 0;
+  
+    cardShreddingContainer.removeAllChildren();
   if (hitted == false) {
+    console.log(playerCard,"opp",oppositeCard)
     if (playerCard > oppositeCard) {
         userPlayCard(null);        
+        console.log("user card greater");
     }
     else {
-      oppositionPlayCard(null);
+      oppositionPlayCard(null,1);
+      console.log("opposite card greater");
     }
+
   }
-  oppositePlayed = 0;
+
 }

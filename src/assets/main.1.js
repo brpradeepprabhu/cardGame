@@ -1,10 +1,10 @@
-var totalplayers = 3;
+var totalplayers = 2;
 var startX = 35;
 var stage, canvas, preload, allCards, queue;
 var players = [];
 var cardShreddingContainer;
-var playerContainer, oppositePlayer;
-var playerCard, oppositeCard = [];
+var playerContainer, oppsitePlayer;
+var playerCard, oppositeCard;
 var oppositePlayed = 0;
 var hitted = false,
   hittedBy = "";
@@ -234,23 +234,18 @@ function init() {
 
 function handleComplete(e) {
   "use strict";
-  canvas.style.display = "block";
+  canvas.style.display="block";
   oppositePlayed = 0;
   hitted = false;
   hittedBy = "";
   cardShreddingContainer = new createjs.Container();
   playerContainer = new createjs.Container();
-  stage.addChild(playerContainer);
-  oppositePlayer = [];
-  for (var i = 1; i < totalplayers; i++) {
-    var oppositeContainer = new createjs.Container();
-    stage.addChild(oppositeContainer);
-    oppositePlayer.push(oppositeContainer);
-  }
+  oppsitePlayer = new createjs.Container();
+  stage.addChild(playerContainer, oppsitePlayer);
   stage.addChild(cardShreddingContainer);
   var card = queue.getResult("card game");
   var bitmap = new createjs.Bitmap(card);
-  bitmap.x = 300;
+  bitmap.x = 0;
   bitmap.y = stage.canvas.height / 2 - card.height / 2;
   stage.addChild(bitmap);
   players = [];
@@ -299,13 +294,8 @@ function showCardsToPlayer() {
   if (indexOf > 0) {
     userPlayCard(null)
   } else {
-    for (i = 1; i < players.length; i += 1) {
-      indexOf = players[i].indexOf(13)
-      if (indexOf > 0) {
-        oppositionPlayCard(null, i)
-        break;
-      }
-    }
+    oppositionPlayCard(null, 1)
+
   }
 }
 
@@ -327,29 +317,19 @@ function createPlayerCard() {
 }
 
 function otherPlayerCard() {
+  oppsitePlayer.removeAllChildren();
   var i, j, images, bitmap;
-  for (i = 0; i < oppositePlayer.length; i++) {
-    oppositePlayer[i].removeAllChildren();
-  }
-  for (j = 0; j < oppositePlayer.length; j += 1) {
-    for (i = 0; i < players[j + 1].length; i += 1) {
+  for (j = 1; j < players.length; j += 1) {
+    for (i = 0; i < players[j].length; i += 1) {
       images = queue.getResult("card game")
       bitmap = new createjs.Bitmap(images)
+      bitmap.x = startX * i;
       bitmap.name = i;
-      bitmap.data = players[j + 1][i];
-      oppositePlayer[j].addChild(bitmap);
-      if (j == 0) {
-        bitmap.x = startX * i;
-        oppositePlayer[j].y = 25;
-        oppositePlayer[j].x = ((stage.canvas.width / 2) - (oppositePlayer[j].getBounds().width / 2));
-      } else {
-        bitmap.y = startX / 2 * i;
-        bitmap.rotation = 90;
-        bitmap.regX = images.width / 2;
-        bitmap.regY = images.height / 2;
-        oppositePlayer[j].x = 100;
-        oppositePlayer[j].y = ((stage.canvas.height / 2) - (oppositePlayer[j].getBounds().height / 2));
-      }
+      bitmap.data = players[j][i];
+      oppsitePlayer.addChild(bitmap);
+      oppsitePlayer.y = 25;
+      oppsitePlayer.x = ((stage.canvas.width / 2) - (oppsitePlayer.getBounds().width / 2));
+
     }
   }
 }
@@ -365,7 +345,7 @@ function oppositionPlayCard(value, playerPosition) {
       random = 0;
     }
     players[playerPosition].splice(random, 1)
-    var target = oppositePlayer[playerPosition - 1].getChildByName(random);
+    var target = oppsitePlayer.getChildByName(random);
     var images = queue.getResult(target.data.toString())
     var cardName = new createjs.Bitmap(images)
     cardName.name = target.name;
@@ -376,15 +356,12 @@ function oppositionPlayCard(value, playerPosition) {
     cardName.x = stage.canvas.width / 2;
     cardName.y = stage.canvas.height / 2;
     cardName.rotation = Math.random() * 360;
-    oppositePlayer[playerPosition - 1].removeChildAt(random);
-    oppositeCard[playerPosition] = target.data;
+    oppsitePlayer.removeChildAt(random);
+    console.log(cardName);
+    oppositeCard = target.data;
     if (hitted == false) {
       oppositePlayed = 1;
-      if (playerPosition == oppositePlayer.length) {
-        userPlayCard(cardName.data);
-      } else {
-        oppositionPlayCard(cardName.data, playerPosition + 1);
-      }
+      userPlayCard(cardName.data);
     } else {
       setTimeout(function () {
         validateNextCardShredding();
@@ -416,7 +393,7 @@ function oppositionPlayCard(value, playerPosition) {
       }
       random = players[playerPosition].indexOf(filterArray[filterRandom])
       players[playerPosition].splice(random, 1);
-      var target = oppositePlayer[playerPosition - 1].getChildByName(random);
+      var target = oppsitePlayer.getChildByName(random);
       var images = queue.getResult(target.data.toString())
       var cardName = new createjs.Bitmap(images);
       cardShreddingContainer.addChild(cardName);
@@ -426,24 +403,14 @@ function oppositionPlayCard(value, playerPosition) {
       cardName.x = stage.canvas.width / 2;
       cardName.y = stage.canvas.height / 2;
       cardName.rotation = Math.random() * 360;
-      oppositeCard[playerPosition] = target.data;
-      oppositePlayer[playerPosition - 1].removeChildAt(random);
-      oppositePlayed += 1;
-      console.log("oppositePlayed", oppositePlayed)
-      if (oppositePlayed == totalplayers) {
-        setTimeout(function () {
-          validateNextCardShredding();
-        }, 2000)
-      } else {
-        if (playerPosition == oppositePlayer.length) {
-          userPlayCard(cardName.data);
-        } else {
-          oppositionPlayCard(cardName.data, playerPosition + 1);
-        }
-      }
+      oppositeCard = target.data;
+      oppsitePlayer.removeChildAt(random);
+      setTimeout(function () {
+        validateNextCardShredding();
+      }, 2000)
     } else {
       hitted = true;
-      hittedBy = playerPosition;
+      hittedBy = "opposite";
       oppositionPlayCard(null, playerPosition)
     }
 
@@ -527,25 +494,14 @@ function userCardAnimated(e, card) {
   playerCard = cardName.data;
   stage.setChildIndex(playerContainer, 0);
   if (oppositePlayed == 0) {
-    oppositePlayed = 1;
     oppositionPlayCard(card.data, 1);
+    oppositePlayed = 1;
   } else {
-    if (hitted == false) {
-      console.log("came here after opposition")
-      oppositePlayed += 1;
-      console.log(oppositePlayed, "oppo user area")
-      if (oppositePlayed < totalplayers) {
-        oppositionPlayCard(card.data, 1);
-      } else {
-        setTimeout(function () {
-          validateNextCardShredding();
-        }, 2000)
-      }
-    } else {
-      setTimeout(function () {
-        validateNextCardShredding();
-      }, 2000)
-    }
+    console.log("hitted", hitted)
+    setTimeout(function () {
+      validateNextCardShredding();
+    }, 2000)
+
   }
   createPlayerCard();
 }
@@ -554,66 +510,41 @@ function validateNextCardShredding() {
   oppositePlayed = 0;
   cardShreddingContainer.removeAllChildren();
   if (hitted == false) {
-    var d = oppositeCard.slice();
-    d.splice(0, 1)
     console.log(playerCard, "opp", oppositeCard)
-    var largest = Math.max.apply(Math, d);
-    if (playerCard > largest) {
+    if (playerCard > oppositeCard) {
+
       userPlayCard(null);
       console.log("user card greater");
     } else {
-      var indexof = oppositeCard.indexOf(largest)
-      oppositionPlayCard(null, indexof);
-      console.log("opposite card greater", indexof);
+      oppositionPlayCard(null, 1);
+      console.log("opposite card greater");
     }
 
   } else {
     hitted = false;
-    alert("hitted", hittedBy)
-    if (hittedBy == "player") {
-      var d = oppositeCard.slice();
-      d.splice(0, 1);
-      var largest = Math.max.apply(Math, d);
-      var indexof = oppositeCard.indexOf(largest)
-      players[indexof].push(playerCard);
-      for (var i = 0; i < d.length; i++) {
-        players[indexof].push(d[i]);
-      }
-      players[indexof].sort(function (a, b) {
+    if (hittedBy == "opposite") {
+      players[0].push(playerCard);
+      players[0].push(oppositeCard);
+      players[0].sort(function (a, b) {
+        return a - b
+      });
+      createPlayerCard();
+      userPlayCard(null);
+    } else {
+      players[1].push(playerCard);
+      players[1].push(oppositeCard);
+      players[1].sort(function (a, b) {
         return a - b
       });
       otherPlayerCard();
-      oppositionPlayCard(null, indexof);
+      oppositionPlayCard(null, 1);
     }
-    else
-    {
-      alert("hitted by ",oppositePlayer);
-    }
-    // if (hittedBy == "opposite") {
-    //   players[0].push(playerCard);
-    //   players[0].push(oppositeCard);
-    //   players[0].sort(function (a, b) {
-    //     return a - b
-    //   });
-    //   createPlayerCard();
-    //   userPlayCard(null);
-    // } else {
-    //   players[1].push(playerCard);
-    //   players[1].push(oppositeCard);
-    //   players[1].sort(function (a, b) {
-    //     return a - b
-    //   });
-    //   otherPlayerCard();
-    //   oppositionPlayCard(null, 1);
-    // }
     hittedBy = "";
   }
-  if (players[0].length == 0) {
-    canvas.style.display = "none";
+  if (players[0].length == 0) {canvas.style.display="none";
     document.getElementById("result").innerHTML = "you won :)";
   }
-  if (players[1].length == 0) {
-    canvas.style.display = "none";
+  if (players[1].length == 0) {canvas.style.display="none";
     document.getElementById("result").innerHTML = "you lose :(";
   }
 }

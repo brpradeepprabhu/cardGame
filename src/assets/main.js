@@ -377,6 +377,7 @@ function oppositionPlayCard(value, playerPosition) {
       var images = queue.getResult(target.data.toString())
       var cardName = new createjs.Bitmap(images)
       cardName.name = target.name;
+      console.log("loaded",cardName)
       cardShreddingContainer.addChild(cardName);
       cardName.data = target.data;
       cardName.regX = cardName.image.width / 2;

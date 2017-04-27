@@ -2,7 +2,7 @@ var totalplayers = 4;
 var startX = 35;
 var stage, canvas, preload, allCards, queue;
 var players = [];
-var cardShreddingContainer;
+var cardShreddingContainer, aspectRatio;
 var playerContainer, oppositePlayer;
 var playerCard, oppositeCard = [];
 var oppositePlayed = 0;
@@ -14,7 +14,8 @@ function init() {
   canvas = document.getElementById('cardGame');
   stage = new createjs.Stage(canvas);
   queue = new createjs.LoadQueue();
-
+  stage.canvas.width = window.innerWidth;
+  stage.canvas.height = window.innerHeight;
   queue.on('complete', handleComplete);
   queue.loadManifest([{
       "id": "1",
@@ -241,6 +242,8 @@ function handleComplete(e) {
   cardShreddingContainer = new createjs.Container();
   playerContainer = new createjs.Container();
   stage.addChild(playerContainer);
+  aspectRatio = window.innerWidth / 1024
+  aspectRatio = aspectRatio > 1 ? 1 : aspectRatio;
   oppositePlayer = [];
   for (var i = 1; i < totalplayers; i++) {
     var oppositeContainer = new createjs.Container();
@@ -250,8 +253,9 @@ function handleComplete(e) {
   stage.addChild(cardShreddingContainer);
   var card = queue.getResult("card game");
   var bitmap = new createjs.Bitmap(card);
-  bitmap.x = 300;
-  bitmap.y = stage.canvas.height / 2 - card.height / 2;
+  bitmap.x = 300 * aspectRatio;
+  bitmap.scaleX= bitmap.scaleY = aspectRatio;
+  bitmap.y = (stage.canvas.height / 2 - card.height / 2)+(25*aspectRatio);
   stage.addChild(bitmap);
   players = [];
   for (var i = 0; i < totalplayers; i++) {
@@ -316,12 +320,13 @@ function createPlayerCard() {
   for (i = 0; i < players[0].length; i += 1) {
     var images = queue.getResult(players[0][i].toString())
     var bitmap = new createjs.Bitmap(images)
-    bitmap.x = startX * i;
+    bitmap.x = startX * i *aspectRatio;
     bitmap.name = i;
     bitmap.data = players[0][i];
+    bitmap.scaleX = bitmap.scaleY = aspectRatio;
     playerContainer.addChild(bitmap);
-    playerContainer.y = stage.canvas.height - images.height - 25;
-    playerContainer.x = ((stage.canvas.width / 2) - (playerContainer.getBounds().width / 2));
+    playerContainer.y = (stage.canvas.height - images.height)+25;
+    playerContainer.x = ((stage.canvas.width / 2) - (playerContainer.getBounds().width / 2))*aspectRatio;
   }
 
 }
@@ -336,26 +341,27 @@ function otherPlayerCard() {
       images = queue.getResult("card game");
       bitmap = new createjs.Bitmap(images)
       bitmap.name = i;
+      bitmap.scaleX = bitmap.scaleY = aspectRatio;
       bitmap.data = players[j + 1][i];
       oppositePlayer[j].addChild(bitmap);
       if (j == 1) {
-        bitmap.x = startX * i;
-        oppositePlayer[j].y = 25;
-        oppositePlayer[j].x = ((stage.canvas.width / 2) - (oppositePlayer[j].getBounds().width / 2));
+        bitmap.x = startX * i * aspectRatio;
+        oppositePlayer[j].y = 25 * aspectRatio;
+        oppositePlayer[j].x = ((stage.canvas.width / 2) - (oppositePlayer[j].getBounds().width / 2)) * aspectRatio;
       } else if (j == 2) {
-        bitmap.y = startX / 2 * i;
+        bitmap.y = startX / 2 * i * aspectRatio;
         bitmap.rotation = 90;
         bitmap.regX = images.width / 2;
         bitmap.regY = images.height / 2;
         oppositePlayer[j].x = stage.canvas.width - 100;
-        oppositePlayer[j].y = ((stage.canvas.height / 2) - (oppositePlayer[j].getBounds().height / 2));
+        oppositePlayer[j].y = ((stage.canvas.height / 2) - (oppositePlayer[j].getBounds().height / 2)) * aspectRatio;
       } else {
-        bitmap.y = startX / 2 * i;
+        bitmap.y = startX / 2 * i * aspectRatio;
         bitmap.rotation = 90;
         bitmap.regX = images.width / 2;
         bitmap.regY = images.height / 2;
-        oppositePlayer[j].x = 100;
-        oppositePlayer[j].y = ((stage.canvas.height / 2) - (oppositePlayer[j].getBounds().height / 2));
+        oppositePlayer[j].x = 100 * aspectRatio;
+        oppositePlayer[j].y = ((stage.canvas.height / 2) - (oppositePlayer[j].getBounds().height / 2)) * aspectRatio;
       }
     }
   }
@@ -374,6 +380,7 @@ function oppositionPlayCard(value, playerPosition) {
       }
       players[playerPosition].splice(random, 1)
       var target = oppositePlayer[playerPosition - 1].getChildByName(random);
+      console.log("target",target)
       var images = queue.getResult(target.data.toString())
       var cardName = new createjs.Bitmap(images)
       cardName.name = target.name;
@@ -381,10 +388,11 @@ function oppositionPlayCard(value, playerPosition) {
       cardShreddingContainer.addChild(cardName);
       cardName.data = target.data;
       cardName.regX = cardName.image.width / 2;
-      cardName.regY = cardName.image.height / 2;
+      cardName.regY = cardName.image.height / 2;      
       cardName.x = stage.canvas.width / 2;
       cardName.y = stage.canvas.height / 2;
       cardName.rotation = Math.random() * 360;
+      cardName.scaleX = cardName.scaleY = aspectRatio;
       oppositePlayer[playerPosition - 1].removeChildAt(random);
       oppositeCard[playerPosition] = target.data;
       if (hitted == false) {
@@ -434,6 +442,7 @@ function oppositionPlayCard(value, playerPosition) {
         cardName.regY = cardName.image.height / 2;
         cardName.x = stage.canvas.width / 2 + (25 * oppositePlayed);
         cardName.y = stage.canvas.height / 2;
+        cardName.scaleX = cardName.scaleY = aspectRatio;
         cardName.rotation = Math.random() * 360;
         oppositeCard[playerPosition] = target.data;
         oppositePlayer[playerPosition - 1].removeChildAt(random);
@@ -533,6 +542,7 @@ function userCardAnimated(e, card) {
   cardName.data = card.data;
   cardName.x = stage.canvas.width / 2;
   cardName.y = stage.canvas.height / 2;
+  cardName.scaleX = cardName.scaleY = aspectRatio;
   cardShreddingContainer.addChild(cardName);
   playerCard = cardName.data;
   stage.setChildIndex(playerContainer, 0);
@@ -633,7 +643,7 @@ function hittedByPlayer() {
   var largest;
   largest = Math.max.apply(Math, d);
   var indexof = oppositeCard.indexOf(largest);
-  
+
   for (var i = 0; i < oppositeCard.length; i++) {
     if (oppositeCard[m] != undefined) {
       players[indexof].push(oppositeCard[i]);

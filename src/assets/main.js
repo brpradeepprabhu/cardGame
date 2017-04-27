@@ -333,7 +333,7 @@ function otherPlayerCard() {
   }
   for (j = 0; j < oppositePlayer.length; j += 1) {
     for (i = 0; i < players[j + 1].length; i += 1) {
-      images = queue.getResult(players[j + 1][i])
+      images = queue.getResult("card game");
       bitmap = new createjs.Bitmap(images)
       bitmap.name = i;
       bitmap.data = players[j + 1][i];

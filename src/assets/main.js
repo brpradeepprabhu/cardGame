@@ -333,12 +333,12 @@ function otherPlayerCard() {
   }
   for (j = 0; j < oppositePlayer.length; j += 1) {
     for (i = 0; i < players[j + 1].length; i += 1) {
-      images = queue.getResult("card game")
+      images = queue.getResult(players[j + 1][i])
       bitmap = new createjs.Bitmap(images)
       bitmap.name = i;
       bitmap.data = players[j + 1][i];
       oppositePlayer[j].addChild(bitmap);
-      if (j == 0) {
+      if (j == 1) {
         bitmap.x = startX * i;
         oppositePlayer[j].y = 25;
         oppositePlayer[j].x = ((stage.canvas.width / 2) - (oppositePlayer[j].getBounds().width / 2));
@@ -429,7 +429,7 @@ function oppositionPlayCard(value, playerPosition) {
       oppositeCard[playerPosition] = target.data;
       oppositePlayer[playerPosition - 1].removeChildAt(random);
       oppositePlayed += 1;
-      console.log("oppositePlayed", oppositePlayed)
+
       if (oppositePlayed == totalplayers) {
         setTimeout(function () {
           validateNextCardShredding();
@@ -443,7 +443,6 @@ function oppositionPlayCard(value, playerPosition) {
       }
     } else {
       hitted = true;
-      console.log("playerPosition", playerPosition);
       hittedBy = playerPosition.toString();
       oppositionPlayCard(null, playerPosition)
     }
@@ -485,7 +484,6 @@ function userPlayCard(value) {
         cardName.addEventListener("click", cardClicked);
       }
     } else {
-      console.log("you are hitting")
       hitted = true;
       hittedBy = "player";
       for (var i = 0; i < playerContainer.numChildren; i++) {
@@ -498,6 +496,10 @@ function userPlayCard(value) {
 
 
 function cardClicked(e) {
+  for (var i = 0; i < playerContainer.numChildren; i++) {
+    var cardName = playerContainer.getChildAt(i);
+    cardName.removeEventListener("click", cardClicked);
+  }
   var cardName = e.currentTarget;
   cardName.regX = cardName.image.width / 2;
   cardName.regY = cardName.image.height / 2;
@@ -513,7 +515,6 @@ function cardClicked(e) {
 }
 
 function userCardAnimated(e, card) {
-  console.log("animation com", card, e, hitted)
   var cardName = card.clone();
   var random = card.name;
   players[0].splice(random, 1)
@@ -532,9 +533,7 @@ function userCardAnimated(e, card) {
     oppositionPlayCard(card.data, 1);
   } else {
     if (hitted == false) {
-      console.log("came here after opposition")
       oppositePlayed += 1;
-      console.log(oppositePlayed, "oppo user area")
       if (oppositePlayed < totalplayers) {
         oppositionPlayCard(card.data, 1);
       } else {
@@ -557,49 +556,56 @@ function validateNextCardShredding() {
   if (hitted == false) {
     var d = oppositeCard.slice();
     d.splice(0, 1)
-    console.log(playerCard, "opp", oppositeCard)
+
     var largest = Math.max.apply(Math, d);
     if (playerCard > largest) {
-      userPlayCard(null);
-      console.log("user card greater");
+      setTimeout(function () {
+        userPlayCard(null);
+      }, 200);
+
     } else {
       var indexof = oppositeCard.indexOf(largest)
       oppositeCard = [];
       otherPlayerCard();
-      oppositionPlayCard(null, indexof);
-      console.log("opposite card greater", indexof);
+      setTimeout(function () {
+        oppositionPlayCard(null, indexof);
+      }, 500);
+
+
     }
 
   } else {
     hitted = false;
     if (hittedBy == "player") {
+
       var d = oppositeCard.slice();
       d.splice(0, 1);
       for (var m = 0; m < d.length; m++) {
         if (d[m] == undefined) {
           d.splice(m, 1)
-        }        
+        }
       }
       var largest;
-      if (d.length>1) {
+      if (d.length > 1) {
         largest = Math.max.apply(Math, d);
       }
       largest = d[0];
       var indexof = oppositeCard.indexOf(largest);
-
-      players[indexof].push(playerCard);
+      console.log("hittedBy player", indexof,d);
       for (var i = 0; i < d.length; i++) {
         players[indexof].push(d[i]);
-        players[indexof].push(playerCard);
       }
+      players[indexof].push(playerCard);
       players[indexof].sort(function (a, b) {
         return a - b
       });
+      otherPlayerCard();
       oppositeCard = [];
-      oppositionPlayCard(null, indexof);
+      setTimeout(function () {
+        oppositionPlayCard(null, indexof);
+      }, 500);
+
     } else {
-      console.log("hitted by ", hittedBy);
-      alert("hitted by ", hittedBy);
       var e = oppositeCard.slice();
       e.splice(hittedBy, 1);
       e.splice(0, 1);
@@ -616,7 +622,9 @@ function validateNextCardShredding() {
           return a - b
         });
         createPlayerCard();
-        userPlayCard(null);
+        setTimeout(function () {
+          userPlayCard(null);
+        }, 200);
       } else {
         for (var m = 0; m < e.length; m++) {
           if (e[m] == undefined) {
@@ -625,28 +633,41 @@ function validateNextCardShredding() {
         }
         var largest = Math.max.apply(Math, e);
         var indexof = oppositeCard.indexOf(largest)
+        console.log("hittest", indexof)
         if (playerCard > oppositeCard[indexof]) {
           for (var m = 0; m < oppositeCard.length; m++) {
             if (oppositeCard[m] != undefined) {
               players[0].push(oppositeCard[m]);
             }
           }
+          players[0].sort(function (a, b) {
+            return a - b
+          })
           createPlayerCard();
-          userPlayCard(null);
+          setTimeout(function () {
+            userPlayCard(null);
+          }, 200);
+
         } else {
           for (var m = 0; m < oppositeCard.length; m++) {
             if (oppositeCard[m] != undefined) {
               players[indexof].push(oppositeCard[m]);
             }
           }
+          players[indexof].sort(function (a, b) {
+            return a - b
+          })
           otherPlayerCard();
           oppositeCard = [];
-          oppositionPlayCard(null, indexof);
+          playerCard = 0;
+          setTimeout(function () {
+            oppositionPlayCard(null, indexof);
+          }, 500);
         }
-        console.log(indexof, "largest", largest);
+
       }
     }
-
+    playerCard = 0;
     hittedBy = "";
   }
   if (players[0].length == 0) {
@@ -654,6 +675,10 @@ function validateNextCardShredding() {
     document.getElementById("result").innerHTML = "you won :)";
   }
   if (players[1].length == 0) {
+    canvas.style.display = "none";
+    document.getElementById("result").innerHTML = "you lose :(";
+  }
+   if (players[2].length == 0) {
     canvas.style.display = "none";
     document.getElementById("result").innerHTML = "you lose :(";
   }

@@ -377,7 +377,7 @@ function oppositionPlayCard(value, playerPosition) {
       var images = queue.getResult(target.data.toString())
       var cardName = new createjs.Bitmap(images)
       cardName.name = target.name;
-      console.log("loaded",cardName)
+      console.log(players[playerPosition], "random", random, "loaded", cardName)
       cardShreddingContainer.addChild(cardName);
       cardName.data = target.data;
       cardName.regX = cardName.image.width / 2;
@@ -627,15 +627,17 @@ function hittedByPlayer() {
   d.splice(0, 1);
   for (var m = 0; m < d.length; m++) {
     if (d[m] == undefined) {
-      d[m]=0;
+      d[m] = 0;
     }
   }
   var largest;
-  largest = Math.max.apply(Math, d); 
+  largest = Math.max.apply(Math, d);
   var indexof = oppositeCard.indexOf(largest);
-  console.log("hittedBy player", indexof, d);
-  for (var i = 0; i < d.length; i++) {
-    players[indexof].push(d[i]);
+  
+  for (var i = 0; i < oppositeCard.length; i++) {
+    if (oppositeCard[m] != undefined) {
+      players[indexof].push(oppositeCard[i]);
+    }
   }
   players[indexof].push(playerCard);
   players[indexof].sort(function (a, b) {
@@ -672,7 +674,7 @@ function whoHitted() {
   // } else {
   for (var m = 0; m < e.length; m++) {
     if (e[m] == undefined) {
-      e[m]=0;
+      e[m] = 0;
     }
   }
   var largest = Math.max.apply(Math, e);

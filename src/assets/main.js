@@ -423,7 +423,7 @@ function oppositionPlayCard(value, playerPosition) {
       cardName.data = target.data;
       cardName.regX = cardName.image.width / 2;
       cardName.regY = cardName.image.height / 2;
-      cardName.x = stage.canvas.width / 2;
+      cardName.x = stage.canvas.width / 2 + (25 * oppositePlayed);
       cardName.y = stage.canvas.height / 2;
       cardName.rotation = Math.random() * 360;
       oppositeCard[playerPosition] = target.data;
@@ -443,7 +443,8 @@ function oppositionPlayCard(value, playerPosition) {
       }
     } else {
       hitted = true;
-      hittedBy = playerPosition;
+      console.log("playerPosition", playerPosition);
+      hittedBy = playerPosition.toString();
       oppositionPlayCard(null, playerPosition)
     }
 
@@ -563,49 +564,89 @@ function validateNextCardShredding() {
       console.log("user card greater");
     } else {
       var indexof = oppositeCard.indexOf(largest)
+      oppositeCard = [];
+      otherPlayerCard();
       oppositionPlayCard(null, indexof);
       console.log("opposite card greater", indexof);
     }
 
   } else {
     hitted = false;
-    alert("hitted", hittedBy)
     if (hittedBy == "player") {
       var d = oppositeCard.slice();
       d.splice(0, 1);
-      var largest = Math.max.apply(Math, d);
-      var indexof = oppositeCard.indexOf(largest)
+      for (var m = 0; m < d.length; m++) {
+        if (d[m] == undefined) {
+          d.splice(m, 1)
+        }        
+      }
+      var largest;
+      if (d.length>1) {
+        largest = Math.max.apply(Math, d);
+      }
+      largest = d[0];
+      var indexof = oppositeCard.indexOf(largest);
+
       players[indexof].push(playerCard);
       for (var i = 0; i < d.length; i++) {
         players[indexof].push(d[i]);
+        players[indexof].push(playerCard);
       }
       players[indexof].sort(function (a, b) {
         return a - b
       });
-      otherPlayerCard();
+      oppositeCard = [];
       oppositionPlayCard(null, indexof);
+    } else {
+      console.log("hitted by ", hittedBy);
+      alert("hitted by ", hittedBy);
+      var e = oppositeCard.slice();
+      e.splice(hittedBy, 1);
+      e.splice(0, 1);
+      var count = 0;
+      for (var m = 0; m < e.length; m++) {
+        if (e[m] != undefined) {
+          count++;
+        }
+      }
+      if (count == 0) {
+        players[0].push(oppositeCard[hittedBy]);
+        players[0].push(playerCard);
+        players[0].sort(function (a, b) {
+          return a - b
+        });
+        createPlayerCard();
+        userPlayCard(null);
+      } else {
+        for (var m = 0; m < e.length; m++) {
+          if (e[m] == undefined) {
+            e.splice(m, 1)
+          }
+        }
+        var largest = Math.max.apply(Math, e);
+        var indexof = oppositeCard.indexOf(largest)
+        if (playerCard > oppositeCard[indexof]) {
+          for (var m = 0; m < oppositeCard.length; m++) {
+            if (oppositeCard[m] != undefined) {
+              players[0].push(oppositeCard[m]);
+            }
+          }
+          createPlayerCard();
+          userPlayCard(null);
+        } else {
+          for (var m = 0; m < oppositeCard.length; m++) {
+            if (oppositeCard[m] != undefined) {
+              players[indexof].push(oppositeCard[m]);
+            }
+          }
+          otherPlayerCard();
+          oppositeCard = [];
+          oppositionPlayCard(null, indexof);
+        }
+        console.log(indexof, "largest", largest);
+      }
     }
-    else
-    {
-      alert("hitted by ",oppositePlayer);
-    }
-    // if (hittedBy == "opposite") {
-    //   players[0].push(playerCard);
-    //   players[0].push(oppositeCard);
-    //   players[0].sort(function (a, b) {
-    //     return a - b
-    //   });
-    //   createPlayerCard();
-    //   userPlayCard(null);
-    // } else {
-    //   players[1].push(playerCard);
-    //   players[1].push(oppositeCard);
-    //   players[1].sort(function (a, b) {
-    //     return a - b
-    //   });
-    //   otherPlayerCard();
-    //   oppositionPlayCard(null, 1);
-    // }
+
     hittedBy = "";
   }
   if (players[0].length == 0) {

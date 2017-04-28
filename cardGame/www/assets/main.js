@@ -10,8 +10,6 @@ var hitted = false,
   hittedBy = "";
 
 function init() {
-  alert("init")
-
   canvas = document.getElementById('cardGame');
   stage = new createjs.Stage(canvas);
   queue = new createjs.LoadQueue(false);
@@ -235,7 +233,6 @@ function init() {
 }
 
 function handleComplete(e) {
-  alert("HANDLE complete")
   canvas.style.display = "block";
   oppositePlayed = 0;
   hitted = false;
@@ -255,8 +252,8 @@ function handleComplete(e) {
   var card = queue.getResult("card game");
   var bitmap = new createjs.Bitmap(card);
   bitmap.x = 300 * aspectRatio;
-  bitmap.scaleX= bitmap.scaleY = aspectRatio;
-  bitmap.y = (stage.canvas.height / 2 - card.height / 2)+(25*aspectRatio);
+  bitmap.scaleX = bitmap.scaleY = aspectRatio;
+  bitmap.y = (stage.canvas.height / 2 - card.height / 2) + (25 * aspectRatio);
   stage.addChild(bitmap);
   players = [];
   for (var i = 0; i < totalplayers; i++) {
@@ -321,13 +318,13 @@ function createPlayerCard() {
   for (i = 0; i < players[0].length; i += 1) {
     var images = queue.getResult(players[0][i].toString())
     var bitmap = new createjs.Bitmap(images)
-    bitmap.x = startX * i *aspectRatio;
+    bitmap.x = startX * i * aspectRatio;
     bitmap.name = i;
     bitmap.data = players[0][i];
     bitmap.scaleX = bitmap.scaleY = aspectRatio;
     playerContainer.addChild(bitmap);
-    playerContainer.y = (stage.canvas.height - images.height)+25;
-    playerContainer.x = ((stage.canvas.width / 2) - (playerContainer.getBounds().width / 2))*aspectRatio;
+    playerContainer.y = (stage.canvas.height - (images.height * aspectRatio)) - 25;
+    playerContainer.x = ((stage.canvas.width / 2) - (playerContainer.getBounds().width / 2)) * aspectRatio;
   }
 
 }
@@ -372,100 +369,126 @@ function oppositionPlayCard(value, playerPosition) {
   //playerContainer.alpha = 0.1;
   var min, max;
   try {
-    if (value == null) {
-      var random;
-      if (players[playerPosition].length > 1) {
-        random = Math.floor(Math.random() * (players[playerPosition].length - 1)) + 1;
-      } else {
-        random = 0;
-      }
-      players[playerPosition].splice(random, 1)
-      var target = oppositePlayer[playerPosition - 1].getChildByName(random);
-      console.log("target",target)
-      var images = queue.getResult(target.data.toString())
-      var cardName = new createjs.Bitmap(images)
-      cardName.name = target.name;
-      console.log(players[playerPosition], "random", random, "loaded", cardName)
-      cardShreddingContainer.addChild(cardName);
-      cardName.data = target.data;
-      cardName.regX = cardName.image.width / 2;
-      cardName.regY = cardName.image.height / 2;      
-      cardName.x = stage.canvas.width / 2;
-      cardName.y = stage.canvas.height / 2;
-      cardName.rotation = Math.random() * 360;
-      cardName.scaleX = cardName.scaleY = aspectRatio;
-      oppositePlayer[playerPosition - 1].removeChildAt(random);
-      oppositeCard[playerPosition] = target.data;
-      if (hitted == false) {
-        oppositePlayed = 1;
-        if (playerPosition == oppositePlayer.length) {
-          userPlayCard(cardName.data);
+    if (players[playerPosition].length >= 1) {
+      if (value == null) {
+        var random;
+        if (players[playerPosition].length > 1) {
+          random = Math.floor(Math.random() * (players[playerPosition].length - 1)) + 1;
         } else {
-          oppositionPlayCard(cardName.data, playerPosition + 1);
+          random = 0;
         }
-      } else {
-        setTimeout(function () {
-          validateNextCardShredding();
-        }, 2000)
-      }
-    } else {
-      if ((value >= 1) && (value <= 13)) {
-        min = 1;
-        max = 13
-      } else if ((value >= 14) && (value <= 26)) {
-        min = 14;
-        max = 26;
-      } else if ((value >= 27) && (value <= 39)) {
-        min = 27;
-        max = 39
-      } else {
-        min = 40;
-        max = 52;
-      }
-      var filterArray = players[playerPosition].filter(function (a, b) {
-        return a >= min && a <= max
-      });
-      if (filterArray.length > 0) {
-        var random, filterRandom;
-        if (filterArray.length > 1) {
-          filterRandom = Math.floor(Math.random() * (filterArray.length - 1)) + 1;
-        } else {
-          filterRandom = 0;
-        }
-        random = players[playerPosition].indexOf(filterArray[filterRandom])
-        players[playerPosition].splice(random, 1);
+
         var target = oppositePlayer[playerPosition - 1].getChildByName(random);
+
         var images = queue.getResult(target.data.toString())
-        var cardName = new createjs.Bitmap(images);
+        var cardName = new createjs.Bitmap(images)
+        cardName.name = target.name;
+
         cardShreddingContainer.addChild(cardName);
         cardName.data = target.data;
         cardName.regX = cardName.image.width / 2;
         cardName.regY = cardName.image.height / 2;
-        cardName.x = stage.canvas.width / 2 + (25 * oppositePlayed);
+        cardName.x = stage.canvas.width / 2;
         cardName.y = stage.canvas.height / 2;
-        cardName.scaleX = cardName.scaleY = aspectRatio;
         cardName.rotation = Math.random() * 360;
-        oppositeCard[playerPosition] = target.data;
+        cardName.scaleX = cardName.scaleY = aspectRatio;
         oppositePlayer[playerPosition - 1].removeChildAt(random);
-        oppositePlayed += 1;
-
-        if (oppositePlayed == totalplayers) {
-          setTimeout(function () {
-            validateNextCardShredding();
-          }, 2000)
-        } else {
+        oppositeCard[playerPosition] = target.data;
+        players[playerPosition].splice(random, 1)
+        if (hitted == false) {
+          oppositePlayed = 1;
           if (playerPosition == oppositePlayer.length) {
             userPlayCard(cardName.data);
           } else {
             oppositionPlayCard(cardName.data, playerPosition + 1);
           }
+        } else {
+          setTimeout(function () {
+            validateNextCardShredding();
+          }, 2000)
         }
       } else {
-        hitted = true;
-        hittedBy = playerPosition.toString();
-        oppositionPlayCard(null, playerPosition)
-      }
+        if ((value >= 1) && (value <= 13)) {
+          min = 1;
+          max = 13
+        } else if ((value >= 14) && (value <= 26)) {
+          min = 14;
+          max = 26;
+        } else if ((value >= 27) && (value <= 39)) {
+          min = 27;
+          max = 39
+        } else {
+          min = 40;
+          max = 52;
+        }
+        var filterArray = players[playerPosition].filter(function (a, b) {
+          return a >= min && a <= max
+        });
+        if (filterArray.length > 0) {
+          var random, filterRandom;
+          if (filterArray.length > 1) {
+            filterRandom = Math.floor(Math.random() * (filterArray.length - 1)) + 1;
+          } else {
+            filterRandom = 0;
+          }
+          random = players[playerPosition].indexOf(filterArray[filterRandom])
+          players[playerPosition].splice(random, 1);
+          var target = oppositePlayer[playerPosition - 1].getChildByName(random);
+          var images = queue.getResult(target.data.toString())
+          var cardName = new createjs.Bitmap(images);
+          cardShreddingContainer.addChild(cardName);
+          cardName.data = target.data;
+          cardName.regX = cardName.image.width / 2;
+          cardName.regY = cardName.image.height / 2;
+          cardName.x = stage.canvas.width / 2 + (50 * aspectRatio* oppositePlayed);
+          cardName.y = stage.canvas.height / 2;
+          cardName.scaleX = cardName.scaleY = aspectRatio;
+          cardName.rotation = Math.random() * 360;
+          oppositeCard[playerPosition] = target.data;
+          oppositePlayer[playerPosition - 1].removeChildAt(random);
+          oppositePlayed += 1;
 
+          if (oppositePlayed == totalplayers) {
+            setTimeout(function () {
+              validateNextCardShredding();
+            }, 2000)
+          } else {
+            if (playerPosition == oppositePlayer.length) {
+              userPlayCard(cardName.data);
+            } else {
+              oppositionPlayCard(cardName.data, playerPosition + 1);
+            }
+          }
+        } else {
+          hitted = true;
+          hittedBy = playerPosition.toString();
+          oppositionPlayCard(null, playerPosition)
+        }
+
+      }
+    } else {
+      oppositeCard[playerPosition] = 0;
+       oppositePlayed += 1;
+      var data = 0;
+      for (var i = 0; i < oppositeCard.length; i++) {
+        if ((oppositeCard[i] != undefined) || (oppositeCard[i] != 0)) {
+          data = oppositeCard[i];
+        }
+      }
+      if (playerPosition == oppositePlayer.length) {
+        if (data != 0) {
+          userPlayCard(data);
+        } else {
+          userPlayCard(null)
+        }
+      } else {
+        if (data != 0) {
+          oppositionPlayCard(data, playerPosition + 1);
+        } else {
+          oppositionPlayCard(null, playerPosition + 1);
+        }
+
+      }
     }
   } catch (e) {
     console.error(e)
@@ -541,7 +564,7 @@ function userCardAnimated(e, card) {
   cardName.regX = cardName.image.width / 2;
   cardName.regY = cardName.image.height / 2;
   cardName.data = card.data;
-  cardName.x = stage.canvas.width / 2;
+  cardName.x = stage.canvas.width / 2 +(50*aspectRatio*oppositePlayed);
   cardName.y = stage.canvas.height / 2;
   cardName.scaleX = cardName.scaleY = aspectRatio;
   cardShreddingContainer.addChild(cardName);
@@ -615,22 +638,32 @@ function checkWhoWon() {
     canvas.style.display = "none";
     document.getElementById("result").innerHTML = "you won :)";
   }
-  if (players[1].length == 0) {
+  var count = 0;
+  for (var i = 1; i < totalplayers; i++) {
+    if (players[i].length == 0) {
+      count++;
+    }
+  }
+  if (count == totalplayers) {
     canvas.style.display = "none";
     document.getElementById("result").innerHTML = "you lose :(";
   }
-  if (totalplayers >= 3) {
-    if (players[2].length == 0) {
-      canvas.style.display = "none";
-      document.getElementById("result").innerHTML = "you lose :(";
-    }
-  }
-  if (totalplayers == 4) {
-    if (players[3].length == 0) {
-      canvas.style.display = "none";
-      document.getElementById("result").innerHTML = "you lose :(";
-    }
-  }
+  // if (players[1].length == 0) {
+  //   canvas.style.display = "none";
+  //   document.getElementById("result").innerHTML = "you lose :(";
+  // }
+  // if (totalplayers >= 3) {
+  //   if (players[2].length == 0) {
+  //     canvas.style.display = "none";
+  //     document.getElementById("result").innerHTML = "you lose :(";
+  //   }
+  // }
+  // if (totalplayers == 4) {
+  //   if (players[3].length == 0) {
+  //     canvas.style.display = "none";
+  //     document.getElementById("result").innerHTML = "you lose :(";
+  //   }
+  // }
 }
 
 function hittedByPlayer() {
@@ -644,16 +677,24 @@ function hittedByPlayer() {
   var largest;
   largest = Math.max.apply(Math, d);
   var indexof = oppositeCard.indexOf(largest);
-
+  console.log("************ hitted by player", oppositeCard, "***", indexof)
   for (var i = 0; i < oppositeCard.length; i++) {
-    if (oppositeCard[m] != undefined) {
-      players[indexof].push(oppositeCard[i]);
+    if (oppositeCard[i] != undefined) {
+      if (oppositeCard[i] != 0) {
+        players[indexof].push(oppositeCard[i]);
+      }
     }
   }
-  players[indexof].push(playerCard);
+  if (playerCard != undefined) {
+    if (playerCard != 0) {
+      players[indexof].push(playerCard);
+    }
+  }
   players[indexof].sort(function (a, b) {
     return a - b
   });
+  console.log("*** p", players[indexof])
+
   otherPlayerCard();
   playerCard = 0;
   oppositeCard = [];
@@ -672,17 +713,6 @@ function whoHitted() {
       count++;
     }
   }
-  // if (count == 0) {
-  //   players[0].push(oppositeCard[hittedBy]);
-  //   players[0].push(playerCard);
-  //   players[0].sort(function (a, b) {
-  //     return a - b
-  //   });
-  //   createPlayerCard();
-  //   setTimeout(function () {
-  //     userPlayCard(null);
-  //   }, 200);
-  // } else {
   for (var m = 0; m < e.length; m++) {
     if (e[m] == undefined) {
       e[m] = 0;
@@ -690,34 +720,50 @@ function whoHitted() {
   }
   var largest = Math.max.apply(Math, e);
   var indexof = oppositeCard.indexOf(largest)
-  console.log("hittest", indexof, playerCard, oppositeCard)
+
   if (playerCard > oppositeCard[indexof]) {
     for (var m = 0; m < oppositeCard.length; m++) {
       if (oppositeCard[m] != undefined) {
-        players[0].push(oppositeCard[m]);
+        if (oppositeCard[m] != 0) {
+          players[indexof].push(oppositeCard[m]);
+        }
       }
     }
-    players[0].push(playerCard);
+    if (playerCard != undefined) {
+      if (playerCard != 0) {
+        players[indexof].push(playerCard);
+      }
+    }
     players[0].sort(function (a, b) {
       return a - b
     })
     createPlayerCard();
+    playerCard = 0;
+    oppositeCard = [];
     setTimeout(function () {
       userPlayCard(null);
     }, 200);
-
+ 
   } else {
+    console.log("************", oppositeCard)
     for (var m = 0; m < oppositeCard.length; m++) {
       if (oppositeCard[m] != undefined) {
-        players[indexof].push(oppositeCard[m]);
+        if (oppositeCard[m] != 0) {
+          players[indexof].push(oppositeCard[m]);
+        }
       }
     }
-    if (playerCard != 0) {
-      players[indexof].push(playerCard);
+    if (playerCard != undefined) {
+      if (playerCard != 0) {
+        players[indexof].push(playerCard);
+      }
     }
     players[indexof].sort(function (a, b) {
       return a - b
     })
+    console.log("--------------------------target indexof", players[indexof])
+    playerCard = 0;
+    oppositeCard = [];
     otherPlayerCard();
     setTimeout(function () {
       oppositionPlayCard(null, indexof);
@@ -725,8 +771,7 @@ function whoHitted() {
   }
 
   // }
-  playerCard = 0;
-  oppositeCard = [];
+
 }
 
 function replayGame() {

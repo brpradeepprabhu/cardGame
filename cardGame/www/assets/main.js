@@ -282,6 +282,7 @@ function shuffleArray() {
       personCount = 0;
     }
     count += 1;
+    players[totalplayers-2]=[];
   }
   showCardsToPlayer();
 
@@ -304,6 +305,7 @@ function showCardsToPlayer() {
     for (i = 1; i < players.length; i += 1) {
       indexOf = players[i].indexOf(13)
       if (indexOf > 0) {
+        console.log("calling from showcards ")
         oppositionPlayCard(null, i)
         break;
       }
@@ -405,6 +407,7 @@ function oppositionPlayCard(value, playerPosition) {
           if (playerPosition == oppositePlayer.length) {
             userPlayCard(cardName.data);
           } else {
+            console.log("calling from oppositionPlayCard inside if condition ")
             oppositionPlayCard(cardName.data, playerPosition + 1);
           }
         } else {
@@ -463,12 +466,14 @@ function oppositionPlayCard(value, playerPosition) {
             if (playerPosition == oppositePlayer.length) {
               userPlayCard(cardName.data);
             } else {
+              console.log("calling from oppositionPlayCard inside else condition ")
               oppositionPlayCard(cardName.data, playerPosition + 1);
             }
           }
         } else {
           hitted = true;
           hittedBy = playerPosition.toString();
+          console.log("calling from oppositionPlayCard inside else condition hitting ")
           oppositionPlayCard(null, playerPosition)
         }
 
@@ -484,7 +489,7 @@ function oppositionPlayCard(value, playerPosition) {
         var data = 0;
         if (playerCard == 0) {
           for (var i = 0; i < oppositeCard.length; i++) {
-            if ((oppositeCard[i] != undefined) || (oppositeCard[i] != 0)) {
+            if ((oppositeCard[i] != undefined) && (oppositeCard[i] != 0)) {
               data = oppositeCard[i];
             }
           }
@@ -498,8 +503,10 @@ function oppositionPlayCard(value, playerPosition) {
           }
         } else {
           if (data != 0) {
+            console.log("calling from oppositionPlayCard inside if condition card empty before ")
             oppositionPlayCard(data, playerPosition + 1);
           } else {
+            onsole.log("calling from oppositionPlayCard inside if condition card empty before ")
             oppositionPlayCard(null, playerPosition + 1);
           }
 
@@ -618,16 +625,20 @@ function shaddingCardsAndNextRound() {
   d.splice(0, 1)
 
   var largest = Math.max.apply(Math, d);
+  console.log(playerCard,"shradding",largest);
   if (playerCard > largest) {
     setTimeout(function () {
       userPlayCard(null);
     }, 200);
 
   } else {
+    
     var indexof = oppositeCard.indexOf(largest)
+      console.log("index of shradding",indexof);
     oppositeCard = [];
     otherPlayerCard();
     setTimeout(function () {
+      console.log("calling from shaddingCardsAndNextRound ")
       oppositionPlayCard(null, indexof);
     }, 2000);
 
@@ -722,6 +733,7 @@ function hittedByPlayer() {
   playerCard = 0;
   oppositeCard = [];
   setTimeout(function () {
+    console.log("calling from hitted by players ")
     oppositionPlayCard(null, indexof);
   }, 2000);
 }
@@ -789,6 +801,7 @@ function whoHitted() {
     oppositeCard = [];
     otherPlayerCard();
     setTimeout(function () {
+      console.log("calling from hitted by some one ")
       oppositionPlayCard(null, indexof);
     }, 2000);
   }

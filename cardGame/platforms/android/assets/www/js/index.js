@@ -33,7 +33,7 @@ var app = {
     // Update DOM on a Received Event
     receivedEvent: function (id) {
         init();
-
+        alert("window.innerWidth",window.innerWidth,"window.innerHeight",window.innerHeight);
         console.log('Received Event: ' + id);
     }
 };

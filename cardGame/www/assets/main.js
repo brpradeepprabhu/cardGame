@@ -282,10 +282,10 @@ function shuffleArray() {
       personCount = 0;
     }
     count += 1;
-    players[1] = [1, 4, 6, 8, 10, 12, 13, 18, 23, 25, 29, 34, 45]
-    players[3] = [2, 5, 7, 9, 11, 14, 15, 24, 26, 27, 28, 32, 33]
-    players[0] = [3, 16, 17, 19, 20, 21, 22, 30, 31, 35, 36, 37, 44]
-    players[2] = [];
+    // players[1] = [1, 4, 6, 8, 10, 12, 13, 18, 23, 25, 29, 34, 45]
+    // players[3] = [2, 5, 7, 9, 11, 14, 15, 24, 26, 27, 28, 32, 33]
+    // players[0] = [3, 16, 17, 19, 20, 21, 22, 30, 31, 35, 36, 37, 44]
+    // players[2] = [];
   }
   showCardsToPlayer();
 
@@ -348,7 +348,7 @@ function otherPlayerCard() {
       bitmap.data = players[j + 1][i];
       oppositePlayer[j].addChild(bitmap);
       if (j == 1) {
-        bitmap.x = startX * i * aspectRatio;
+        bitmap.x = startX/2 * i * aspectRatio;
         oppositePlayer[j].y = 25 * aspectRatio;
         oppositePlayer[j].x = ((stage.canvas.width / 2) - (oppositePlayer[j].getBounds().width / 2)) * aspectRatio;
       } else if (j == 2) {

@@ -4,7 +4,7 @@ var stage, canvas, preload, allCards, queue;
 var players = [];
 var cardShreddingContainer, aspectRatio;
 var playerContainer, oppositePlayer;
-var playerCard, oppositeCard = [];
+var playerCard = 0, oppositeCard = [];
 var oppositePlayed = 0;
 var hitted = false,
   hittedBy = "";
@@ -282,7 +282,10 @@ function shuffleArray() {
       personCount = 0;
     }
     count += 1;
-    players[totalplayers-2]=[];
+    players[1] = [1, 4, 6, 8, 10, 12, 13, 18, 23, 25, 29, 34, 45]
+    players[3] = [2, 5, 7, 9, 11, 14, 15, 24, 26, 27, 28, 32, 33]
+    players[0] = [3, 16, 17, 19, 20, 21, 22, 30, 31, 35, 36, 37, 44]
+    players[2] = [];
   }
   showCardsToPlayer();
 
@@ -374,6 +377,7 @@ function oppositionPlayCard(value, playerPosition) {
     if (players[playerPosition].length >= 1) {
       if (value == null) {
         if (hitted == false) {
+          playerCard = 0;
           console.log("cleared")
           oppositeCard.splice(0, oppositeCard.length);
         }
@@ -486,31 +490,23 @@ function oppositionPlayCard(value, playerPosition) {
           validateNextCardShredding();
         }, 2000)
       } else {
+
         var data = 0;
         if (playerCard == 0) {
           for (var i = 0; i < oppositeCard.length; i++) {
             if ((oppositeCard[i] != undefined) && (oppositeCard[i] != 0)) {
               data = oppositeCard[i];
+              console.log("card empty -- if", data)
+              nextCardPlayerEmpty(data,playerPosition);
+              break;
             }
           }
-        }
-        else { data = playerCard}
-        if (playerPosition == oppositePlayer.length) {
-          if (data != 0) {
-            userPlayCard(data);
-          } else {
-            userPlayCard(null)
-          }
         } else {
-          if (data != 0) {
-            console.log("calling from oppositionPlayCard inside if condition card empty before ")
-            oppositionPlayCard(data, playerPosition + 1);
-          } else {
-            onsole.log("calling from oppositionPlayCard inside if condition card empty before ")
-            oppositionPlayCard(null, playerPosition + 1);
-          }
-
+          data = playerCard;
+          nextCardPlayerEmpty(data,playerPosition);
         }
+        console.log("card empty", data)
+
       }
     }
   } catch (e) {
@@ -518,6 +514,25 @@ function oppositionPlayCard(value, playerPosition) {
   }
   otherPlayerCard();
 
+}
+
+function nextCardPlayerEmpty(data,playerPosition) {
+  if (playerPosition == oppositePlayer.length) {
+    if (data != 0) {
+      userPlayCard(data);
+    } else {
+      userPlayCard(null)
+    }
+  } else {
+    if (data != 0) {
+      console.log("calling from oppositionPlayCard inside if condition card empty before ")
+      oppositionPlayCard(data, playerPosition + 1);
+    } else {
+      onsole.log("calling from oppositionPlayCard inside if condition card empty before ")
+      oppositionPlayCard(null, playerPosition + 1);
+    }
+
+  }
 }
 
 function userPlayCard(value) {
@@ -625,16 +640,16 @@ function shaddingCardsAndNextRound() {
   d.splice(0, 1)
 
   var largest = Math.max.apply(Math, d);
-  console.log(playerCard,"shradding",largest);
+  console.log(playerCard, "shradding", largest);
   if (playerCard > largest) {
     setTimeout(function () {
       userPlayCard(null);
     }, 200);
 
   } else {
-    
+
     var indexof = oppositeCard.indexOf(largest)
-      console.log("index of shradding",indexof);
+    console.log("index of shradding", indexof);
     oppositeCard = [];
     otherPlayerCard();
     setTimeout(function () {
@@ -678,7 +693,7 @@ function checkWhoWon() {
       count++;
     }
   }
-  if (count == totalplayers-1) {
+  if (count == totalplayers - 1) {
     canvas.style.display = "none";
     document.getElementById("result").innerHTML = "you lose :(";
   }

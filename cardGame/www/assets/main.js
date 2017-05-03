@@ -4,7 +4,8 @@ var stage, canvas, preload, allCards, queue;
 var players = [];
 var cardShreddingContainer, aspectRatio;
 var playerContainer, oppositePlayer;
-var playerCard = 0, oppositeCard = [];
+var playerCard = 0,
+  oppositeCard = [];
 var oppositePlayed = 0;
 var hitted = false,
   hittedBy = "";
@@ -348,7 +349,7 @@ function otherPlayerCard() {
       bitmap.data = players[j + 1][i];
       oppositePlayer[j].addChild(bitmap);
       if (j == 1) {
-        bitmap.x = startX/2 * i * aspectRatio;
+        bitmap.x = startX / 2 * i * aspectRatio;
         oppositePlayer[j].y = 25 * aspectRatio;
         oppositePlayer[j].x = ((stage.canvas.width / 2) - (oppositePlayer[j].getBounds().width / 2)) * aspectRatio;
       } else if (j == 2) {
@@ -366,6 +367,37 @@ function otherPlayerCard() {
         oppositePlayer[j].x = 100 * aspectRatio;
         oppositePlayer[j].y = ((stage.canvas.height / 2) - (oppositePlayer[j].getBounds().height / 2)) * aspectRatio;
       }
+    }
+  }
+}
+
+function oppositeCardPlayedNull(e, cardName, playerPosition) {
+  if (hitted == false) {
+    oppositePlayed = 1;
+    if (playerPosition == oppositePlayer.length) {
+      userPlayCard(cardName.data);
+    } else {
+      console.log("calling from oppositionPlayCard inside if condition ")
+      oppositionPlayCard(cardName.data, playerPosition + 1);
+    }
+  } else {
+    setTimeout(function () {
+      validateNextCardShredding();
+    }, 1000)
+  }
+}
+
+function oppositeCardPlayed(e, cardName, playerPosition) {
+  if (oppositePlayed == totalplayers) {
+    setTimeout(function () {
+      validateNextCardShredding();
+    }, 1000)
+  } else {
+    if (playerPosition == oppositePlayer.length) {
+      userPlayCard(cardName.data);
+    } else {
+      console.log("calling from oppositionPlayCard inside else condition ")
+      oppositionPlayCard(cardName.data, playerPosition + 1);
     }
   }
 }
@@ -393,32 +425,25 @@ function oppositionPlayCard(value, playerPosition) {
         var images = queue.getResult(target.data.toString())
         var cardName = new createjs.Bitmap(images)
         cardName.name = target.name;
-
         cardShreddingContainer.addChild(cardName);
         cardName.data = target.data;
         cardName.regX = cardName.image.width / 2;
         cardName.regY = cardName.image.height / 2;
-        cardName.x = stage.canvas.width / 2;
-        cardName.y = stage.canvas.height / 2;
+        cardName.x = target.x + oppositePlayer[playerPosition - 1].x;
+        cardName.y = target.y + oppositePlayer[playerPosition - 1].y;
         cardName.rotation = Math.random() * 360;
         cardName.scaleX = cardName.scaleY = aspectRatio;
         oppositePlayer[playerPosition - 1].removeChildAt(random);
         oppositeCard[playerPosition] = target.data;
         console.log("target.data first", target.data, oppositeCard)
         players[playerPosition].splice(random, 1)
-        if (hitted == false) {
-          oppositePlayed = 1;
-          if (playerPosition == oppositePlayer.length) {
-            userPlayCard(cardName.data);
-          } else {
-            console.log("calling from oppositionPlayCard inside if condition ")
-            oppositionPlayCard(cardName.data, playerPosition + 1);
-          }
-        } else {
-          setTimeout(function () {
-            validateNextCardShredding();
-          }, 2000)
-        }
+        createjs.Tween.get(cardName)
+          .to({
+            x: stage.canvas.width / 2 + (25 * aspectRatio * oppositePlayed),
+            y: stage.canvas.height / 2
+          }, 500)
+          .call(createjs.proxy(oppositeCardPlayedNull,this, cardName, playerPosition));
+
       } else {
         if ((value >= 1) && (value <= 13)) {
           min = 1;
@@ -452,32 +477,23 @@ function oppositionPlayCard(value, playerPosition) {
           cardName.data = target.data;
           cardName.regX = cardName.image.width / 2;
           cardName.regY = cardName.image.height / 2;
-          cardName.x = stage.canvas.width / 2 + (50 * aspectRatio * oppositePlayed);
-          cardName.y = stage.canvas.height / 2;
+          cardName.x = target.x + oppositePlayer[playerPosition - 1].x;
+          cardName.y = target.y + oppositePlayer[playerPosition - 1].y;
           cardName.scaleX = cardName.scaleY = aspectRatio;
           cardName.rotation = Math.random() * 360;
-
           oppositeCard[playerPosition] = target.data;
           console.log("target.data n", target.data, oppositeCard)
           oppositePlayer[playerPosition - 1].removeChildAt(random);
           oppositePlayed += 1;
-
-          if (oppositePlayed == totalplayers) {
-            setTimeout(function () {
-              validateNextCardShredding();
-            }, 2000)
-          } else {
-            if (playerPosition == oppositePlayer.length) {
-              userPlayCard(cardName.data);
-            } else {
-              console.log("calling from oppositionPlayCard inside else condition ")
-              oppositionPlayCard(cardName.data, playerPosition + 1);
-            }
-          }
+          createjs.Tween.get(cardName)
+            .to({
+              x: stage.canvas.width / 2 + (25 * aspectRatio * oppositePlayed),
+              y: stage.canvas.height / 2
+            }, 500)
+            .call(createjs.proxy(oppositeCardPlayed,this, cardName, playerPosition));
         } else {
           hitted = true;
           hittedBy = playerPosition.toString();
-          console.log("calling from oppositionPlayCard inside else condition hitting ")
           oppositionPlayCard(null, playerPosition)
         }
 
@@ -490,20 +506,19 @@ function oppositionPlayCard(value, playerPosition) {
           validateNextCardShredding();
         }, 2000)
       } else {
-
         var data = 0;
         if (playerCard == 0) {
           for (var i = 0; i < oppositeCard.length; i++) {
             if ((oppositeCard[i] != undefined) && (oppositeCard[i] != 0)) {
               data = oppositeCard[i];
               console.log("card empty -- if", data)
-              nextCardPlayerEmpty(data,playerPosition);
+              nextCardPlayerEmpty(data, playerPosition);
               break;
             }
           }
         } else {
           data = playerCard;
-          nextCardPlayerEmpty(data,playerPosition);
+          nextCardPlayerEmpty(data, playerPosition);
         }
         console.log("card empty", data)
 
@@ -516,7 +531,7 @@ function oppositionPlayCard(value, playerPosition) {
 
 }
 
-function nextCardPlayerEmpty(data,playerPosition) {
+function nextCardPlayerEmpty(data, playerPosition) {
   if (playerPosition == oppositePlayer.length) {
     if (data != 0) {
       userPlayCard(data);
@@ -607,7 +622,7 @@ function userCardAnimated(e, card) {
   cardName.regX = cardName.image.width / 2;
   cardName.regY = cardName.image.height / 2;
   cardName.data = card.data;
-  cardName.x = stage.canvas.width / 2 + (50 * aspectRatio * oppositePlayed);
+  cardName.x = stage.canvas.width / 2 + (25 * aspectRatio * oppositePlayed);
   cardName.y = stage.canvas.height / 2;
   cardName.scaleX = cardName.scaleY = aspectRatio;
   cardShreddingContainer.addChild(cardName);
@@ -624,12 +639,12 @@ function userCardAnimated(e, card) {
       } else {
         setTimeout(function () {
           validateNextCardShredding();
-        }, 2000)
+        }, 1000)
       }
     } else {
       setTimeout(function () {
         validateNextCardShredding();
-      }, 2000)
+      }, 1000)
     }
   }
   createPlayerCard();
@@ -655,7 +670,7 @@ function shaddingCardsAndNextRound() {
     setTimeout(function () {
       console.log("calling from shaddingCardsAndNextRound ")
       oppositionPlayCard(null, indexof);
-    }, 2000);
+    }, 200);
 
 
   }
@@ -697,22 +712,6 @@ function checkWhoWon() {
     canvas.style.display = "none";
     document.getElementById("result").innerHTML = "you lose :(";
   }
-  // if (players[1].length == 0) {
-  //   canvas.style.display = "none";
-  //   document.getElementById("result").innerHTML = "you lose :(";
-  // }
-  // if (totalplayers >= 3) {
-  //   if (players[2].length == 0) {
-  //     canvas.style.display = "none";
-  //     document.getElementById("result").innerHTML = "you lose :(";
-  //   }
-  // }
-  // if (totalplayers == 4) {
-  //   if (players[3].length == 0) {
-  //     canvas.style.display = "none";
-  //     document.getElementById("result").innerHTML = "you lose :(";
-  //   }
-  // }
 }
 
 function hittedByPlayer() {

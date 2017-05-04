@@ -1,0 +1,23 @@
+body {
+    position: absolute;
+    width: 1024px;
+    height: 768px;
+    left: 0;
+    right: 0;
+    top: 0;
+    margin:  0 ;
+}
+
+canvas {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+}
+#animationContainer
+{
+     position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+}

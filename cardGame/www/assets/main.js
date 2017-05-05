@@ -12,6 +12,12 @@ var hitted = false,
 var loadCount = 0;
 var imagesArray = [],
   loadingCardImage;
+createjs.proxy = function (method, scope) {
+  var aArgs = Array.prototype.slice.call(arguments, 2);
+  return function () {
+    return method.apply(scope, Array.prototype.slice.call(arguments, 0).concat(aArgs));
+  };
+}
 
 function init() {
   canvas = document.getElementById('cardGame');
@@ -91,30 +97,34 @@ function animateAll() {
     var cardHeight = 768 / 2 - spadeCard.height / 2;
     spadeCard.style.position = "absolute";
     spadeCard.style.left = cardWidth + "px";
-    spadeCard.style.top = cardHeight + "px";   
+    spadeCard.style.top = cardHeight + "px";
     var random = Math.floor(Math.random() * 2) + 1;
     if (random == 1) {
       anime({
         targets: spadeCard,
         opacity: 1,
-        top:Math.floor(Math.random() * 768) + 1,
+        top: Math.floor(Math.random() * 768) + 1,
         left: Math.floor(Math.random() * 1024) + 1,
-        duration: 3000, scale:0
+        duration: 3000,
+        scale: 0
       });
     } else {
       anime({
         targets: spadeCard,
         opacity: 1,
-        top: 768,
+        top: Math.floor(Math.random() * 768) + 1,
         left: Math.floor(Math.random() * 1024) + 1,
         duration: 3000,
-        scale:0
+        scale: 0
       });
     }
   }
+  setTimeout(function () {
+    handleComplete()
+  }, 2000)
 }
 
-function handleComplete(e) {
+function handleComplete() {
   canvas.style.display = "block";
   oppositePlayed = 0;
   hitted = false;
@@ -299,7 +309,7 @@ function oppositionPlayCard(value, playerPosition) {
 
         var target = oppositePlayer[playerPosition - 1].getChildByName(random);
 
-        var images = imagesArray(target.data.toString())
+        var images = imagesArray[target.data.toString()]
         var cardName = new createjs.Bitmap(images)
         cardName.name = target.name;
         cardShreddingContainer.addChild(cardName);
@@ -348,7 +358,7 @@ function oppositionPlayCard(value, playerPosition) {
           random = players[playerPosition].indexOf(filterArray[filterRandom])
           players[playerPosition].splice(random, 1);
           var target = oppositePlayer[playerPosition - 1].getChildByName(random);
-          var images = imagesArray(target.data.toString())
+          var images = imagesArray[target.data.toString()];
           var cardName = new createjs.Bitmap(images);
           cardShreddingContainer.addChild(cardName);
           cardName.data = target.data;

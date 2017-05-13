@@ -103,19 +103,20 @@ function animateAll() {
       anime({
         targets: spadeCard,
         opacity: 1,
-        top: Math.floor(Math.random() * 768) + 1,
-        left: Math.floor(Math.random() * 1024) + 1,
-        duration: 3000,
-        scale: 0
+        top: Math.floor(Math.random() * 768- spadeCard.height / 2) + 1,
+        left: Math.floor(Math.random() * 1024- spadeCard.width / 2) + 1,
+        duration: 500,
+        scale: 0,easing: 'linear'
       });
     } else {
       anime({
         targets: spadeCard,
         opacity: 1,
-        top: Math.floor(Math.random() * 768) + 1,
-        left: Math.floor(Math.random() * 1024) + 1,
-        duration: 3000,
-        scale: 0
+        top: Math.floor(Math.random() * 768- spadeCard.height / 2) + 1,
+        left: Math.floor(Math.random() * 1024- spadeCard.width / 2) + 1,
+        duration: 500,
+        scale: 0,
+        easing: 'linear'
       });
     }
   }

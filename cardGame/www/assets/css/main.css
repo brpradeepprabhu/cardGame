@@ -5,7 +5,7 @@ body {
     left: 0;
     right: 0;
     top: 0;
-    margin:  0 ;
+    margin: 0;
 }
 
 canvas {
@@ -14,10 +14,44 @@ canvas {
     right: 0;
     top: 0;
 }
-#animationContainer
-{
-     position: absolute;
+
+#animationContainer {
+    position: absolute;
     left: 0;
     right: 0;
     top: 0;
+}
+
+#resultPage {
+    position: absolute;
+    z-index: 1000;
+    background: darkgreen;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: none;
+}
+
+#imageSecond {
+    top: 40%;
+    position: absolute;
+    left: 65%;
+}
+
+#imageOne {
+    top: 40%;
+    position: absolute;
+    left: 25%;
+}
+
+button {
+    top: 50%;
+    position: absolute;
+    margin-left: -4%;
+}
+
+h1 {
+    top: 40%;
+    position: relative;
+    color: white;
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
@@ -8,7 +9,7 @@
     <link rel="stylesheet" href="./assets/css/main.css">
     <script src="./assets/lib/easeljs.js"></script>
     <script src="./assets/lib/tweenjs.js"></script>
-     <script src="./assets/lib/anime.js"></script>
+    <script src="./assets/lib/anime.js"></script>
     <script src="./assets/main.js"></script>
     <title></title>
 </head>
@@ -16,12 +17,16 @@
 <body onload="init()">
     <div class="app">
         <canvas id="cardGame" style="background-color: darkgreen;position: absolute;left: 0;top: 0;"></canvas>
-        <h1 id="result"></h1>
-        <button onclick="replayGame()">play again</button>
-    </div>  
+        <div id="resultPage">
+              <img src="assets/images/13.png"id="imageOne">
+                   <img src="assets/images/26.png" id="imageSecond">
+            <h1 id="result">You are lost</h1>
+            <button onclick="replayGame()">play again</button>
+        </div>
+    </div>
     <div id="animationContainer">
-        
-    </div>  
+
+    </div>
 </body>
 
 </html>

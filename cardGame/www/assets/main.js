@@ -319,7 +319,7 @@ function oppositionPlayCard(value, playerPosition) {
         cardName.regY = cardName.image.height / 2;
         cardName.x = target.x + oppositePlayer[playerPosition - 1].x;
         cardName.y = target.y + oppositePlayer[playerPosition - 1].y;
-        cardName.rotation = Math.random() * 360;
+       // cardName.rotation = Math.random() * 360;
         cardName.scaleX = cardName.scaleY = aspectRatio;
         oppositePlayer[playerPosition - 1].removeChildAt(random);
         oppositeCard[playerPosition] = target.data;
@@ -328,7 +328,8 @@ function oppositionPlayCard(value, playerPosition) {
         createjs.Tween.get(cardName)
           .to({
             x: stage.canvas.width / 2 + (25 * aspectRatio * oppositePlayed),
-            y: stage.canvas.height / 2
+            y: stage.canvas.height / 2,
+            rotation:Math.random() * 360
           }, 500)
           .call(createjs.proxy(oppositeCardPlayedNull, this, cardName, playerPosition));
 
@@ -368,7 +369,7 @@ function oppositionPlayCard(value, playerPosition) {
           cardName.x = target.x + oppositePlayer[playerPosition - 1].x;
           cardName.y = target.y + oppositePlayer[playerPosition - 1].y;
           cardName.scaleX = cardName.scaleY = aspectRatio;
-          cardName.rotation = Math.random() * 360;
+         // cardName.rotation = Math.random() * 360;
           oppositeCard[playerPosition] = target.data;
           console.log("target.data n", target.data, oppositeCard)
           oppositePlayer[playerPosition - 1].removeChildAt(random);
@@ -376,7 +377,8 @@ function oppositionPlayCard(value, playerPosition) {
           createjs.Tween.get(cardName)
             .to({
               x: stage.canvas.width / 2 + (25 * aspectRatio * oppositePlayed),
-              y: stage.canvas.height / 2
+              y: stage.canvas.height / 2,
+              rotation : Math.random() * 360
             }, 500)
             .call(createjs.proxy(oppositeCardPlayed, this, cardName, playerPosition));
         } else {
@@ -589,6 +591,7 @@ function checkWhoWon() {
   if (players[0].length == 0) {
     canvas.style.display = "none";
     document.getElementById("result").innerHTML = "you won :)";
+    document.getElementById("resultPage").style.display="block";
   }
   var count = 0;
   for (var i = 1; i < totalplayers; i++) {
@@ -599,6 +602,7 @@ function checkWhoWon() {
   if (count == totalplayers - 1) {
     canvas.style.display = "none";
     document.getElementById("result").innerHTML = "you lose :(";
+    document.getElementById("resultPage").style.display="block";
   }
 }
 
@@ -716,5 +720,6 @@ function whoHitted() {
 
 function replayGame() {
   stage.removeAllChildren();
+  document.getElementById("resultPage").style.display="none";
   handleComplete();
 }

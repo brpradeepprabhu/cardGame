@@ -31,8 +31,8 @@ function init() {
   var scaleY = window.innerHeight / 768;
   loadingCardImage.onload = function (e) {
     imagesArray["card game"] = e.currentTarget;
-    var cardWidth = 1024 / 2 - e.currentTarget.width / 2;
-    var cardHeight = 768 / 2 - e.currentTarget.height / 2;
+    var cardWidth = window.innerWidth / 2 - e.currentTarget.width / 2;
+    var cardHeight = window.innerHeight / 2 - e.currentTarget.height / 2;
     loadingCardImage.style.position = "absolute";
     loadingCardImage.style.left = cardWidth + "px";
     loadingCardImage.style.top = cardHeight + "px";
@@ -73,8 +73,8 @@ function loadImages() {
 function createSpadeCard() {
   var spadeCard = imagesArray[13];
   document.getElementById("animationContainer").appendChild(spadeCard);
-  var cardWidth = 1024 / 2 - spadeCard.width / 2;
-  var cardHeight = 768 / 2 - spadeCard.height / 2;
+   var cardWidth = window.innerWidth / 2 - spadeCard.width / 2;
+    var cardHeight = window.innerHeight / 2 - spadeCard.height / 2;
   spadeCard.style.position = "absolute";
   spadeCard.style.left = cardWidth + "px";
   spadeCard.style.top = cardHeight + "px";
@@ -93,8 +93,8 @@ function animateAll() {
   for (var i = 1; i < 52; i++) {
     var spadeCard = imagesArray[i];
     document.getElementById("animationContainer").appendChild(spadeCard);
-    var cardWidth = 1024 / 2 - spadeCard.width / 2;
-    var cardHeight = 768 / 2 - spadeCard.height / 2;
+    var cardWidth = window.innerWidth / 2 - spadeCard.width / 2;
+    var cardHeight = window.innerHeight / 2 - spadeCard.height / 2;
     spadeCard.style.position = "absolute";
     spadeCard.style.left = cardWidth + "px";
     spadeCard.style.top = cardHeight + "px";
@@ -103,8 +103,8 @@ function animateAll() {
       anime({
         targets: spadeCard,
         opacity: 1,
-        top: Math.floor(Math.random() * 768- spadeCard.height / 2) + 1,
-        left: Math.floor(Math.random() * 1024- spadeCard.width / 2) + 1,
+        top: Math.floor(Math.random() * window.innerHeight- spadeCard.height / 2) + 1,
+        left: Math.floor(Math.random() * window.innerWidth- spadeCard.width / 2) + 1,
         duration: 500,
         scale: 0,easing: 'linear'
       });
@@ -121,12 +121,19 @@ function animateAll() {
     }
   }
   setTimeout(function () {
+    var animContainer =   document.getElementById("animationContainer");
+    for(var i=0;i<animContainer.childNodes.length;i++)
+    {
+      animContainer.removeChild(animContainer.childNodes[i]);
+    }
     handleComplete()
   }, 2000)
 }
 
 function handleComplete() {
   canvas.style.display = "block";
+  canvas.style.left= (window.innerWidth-1024)/2 +"px";
+  canvas.style.top= (window.innerHeight-768)/2+"px";
   oppositePlayed = 0;
   hitted = false;
   hittedBy = "";
@@ -191,6 +198,7 @@ function showCardsToPlayer() {
   createPlayerCard();
   otherPlayerCard();
   indexOf = players[0].indexOf(13)
+  console.log(indexOf)
   if (indexOf > 0) {
     userPlayCard(null)
   } else {
